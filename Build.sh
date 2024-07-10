@@ -1,0 +1,1 @@
+g++ Source/NMake.cpp -o nmake
