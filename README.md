@@ -1,8 +1,7 @@
-<div style="display:flex;justify-content: center;">
+<div align="center">
   <img src="screenshots/logo.png">
 </div>
 
-#
 ---
 
 # NMake
