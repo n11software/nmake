@@ -1,0 +1,18 @@
+-*-text-*-
+
+If you're looking for more in-depth tasks to take on, see TASKS.
+
+This files just lists a bunch of things on our stack.  It might reference
+private conversations, so it might not make sense out of context.  This
+is just under version control just for team convenience -- feel free to
+add your own tasks to it, it'll probably help all of us understand who's
+working on what.
+
+------------------------------------------------------------------------
+
+the "i've given up on this" wall of fame (someone grab these):
+
+aris todo:
+
+	- split up current nmake.cpp file into multiple files
+

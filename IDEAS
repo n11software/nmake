@@ -1,0 +1,19 @@
+-*- outline -*-
+
+some rando ideas go here/change requests
+kept under version control cuz convenience is great
+
+* Change #1: Actual GUI client
+STATUS: Being discussed (gotta create an email thread for this)
+The Way It Works Now:
+	We only have a simple TUI client.
+
+Proposed Change:
+	Build an actual GUI client (built on [need to discuss]) to
+	manage the build system directly, as well as create environments
+	and all that other shit.
+
+Rationale:
+	Sometimes it makes life easier just to manage the build config
+	through a GUI interface or at least have a separate window to
+	manage this.
