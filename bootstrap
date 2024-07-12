@@ -1,0 +1,1 @@
+g++ -o nmake Source/nmake.cpp Source/Utils/FileUtils.cpp Source/Utils/StringUtils.cpp Source/Utils/TerminalUtils.cpp -g -O2 -Wall

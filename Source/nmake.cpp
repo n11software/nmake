@@ -1,3 +1,7 @@
+#include "Utils/FileUtils.h"
+#include "Utils/StringUtils.h"
+#include "Utils/TerminalUtils.h"
+
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -11,126 +15,6 @@
 #include <variant>
 #include <filesystem>
 #include <cstddef>
-
-char getch() {
-    char buf = 0;
-    struct termios old = {0};
-    if (tcgetattr(0, &old) < 0) {
-        perror("tcgetattr");
-    }
-    old.c_lflag &= ~ICANON;
-    old.c_lflag &= ~ECHO;
-    old.c_cc[VMIN] = 1;
-    old.c_cc[VTIME] = 0;
-    if (tcsetattr(0, TCSANOW, &old) < 0) {
-        perror("tcsetattr");
-    }
-    if (read(0, &buf, 1) < 0) {
-        perror("read");
-    }
-    old.c_lflag |= ICANON;
-    old.c_lflag |= ECHO;
-    if (tcsetattr(0, TCSADRAIN, &old) < 0) {
-        perror("tcsetattr");
-    }
-    return buf;
-}
-
-void setTextColor(int color) {
-    if (color == 9) // Blue color for selected option
-        std::cout << "\033[1;34m";
-    else
-        std::cout << "\033[0m"; // Reset color
-}
-
-void moveCursorUp(int lines) {
-    std::cout << "\033[" << lines << "A";
-}
-
-void moveCursorAndClear(int lines) {
-  moveCursorUp(lines);
-  for (int i = 0; i < lines;i++) std::cout << "                                                                                                        \n";
-  moveCursorUp(lines);
-}
-
-void clearScreen() {
-    std::cout << "\033[H\033[J";
-}
-
-std::string optionMenu(const std::vector<std::string>& opt) {
-  int selected = 0;
-  for (int i = 0; i < opt.size(); ++i) {
-    if (i == selected) {
-      setTextColor(9); // Blue color
-      std::cout << "> " << opt[i] << "\n";
-      setTextColor(0); // Reset color
-    } else std::cout << "  " << opt[i] << "\n";
-  }
-  while (true) {
-    char ch = getch();
-    if (ch == 27) { // Escape sequence
-      ch = getch();
-      if (ch == 91) { // Arrow keys
-        ch = getch();
-        if (ch == 65) { // Up arrow
-          if (selected > 0) selected--;
-          else selected = opt.size() - 1;
-        } else if (ch == 66) { // Down arrow
-          if (selected < opt.size() - 1) selected++;
-          else selected = 0;
-        }
-      }
-    } else if (ch == 10) break;
-
-    moveCursorAndClear(opt.size());
-    for (int i = 0; i < opt.size(); ++i) {
-      if (i == selected) {
-        setTextColor(9); // Blue color
-        std::cout << "> " << opt[i] << "\n";
-        setTextColor(0); // Reset color
-      } else std::cout << "  " << opt[i] << "\n";
-    }
-  }
-  moveCursorAndClear(opt.size()+2);
-  return opt[selected];
-}
-
-// Trim functions to remove whitespaces from the beginning and end of a string
-std::string ltrim(const std::string& s) {
-    auto start = std::find_if(s.begin(), s.end(), [](unsigned char ch) {
-        return !std::isspace(ch);
-    });
-    return std::string(start, s.end());
-}
-
-std::string rtrim(const std::string& s) {
-    auto end = std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
-        return !std::isspace(ch);
-    });
-    return std::string(s.begin(), end.base());
-}
-
-std::string trim(const std::string& s) {
-    return ltrim(rtrim(s));
-}
-
-bool is_digits(std::string& str) {
-  for (char ch : str) {
-    int v = ch;
-    if (!(ch >= 48 && ch <= 57)) {
-      return false;
-    }
-  }
-  return true;
-}
-
-std::vector<std::string> split(const std::string& str, char delimiter) {
-  std::vector<std::string> tokens;
-  std::string token;
-  std::istringstream tokenStream(str);
-  while (std::getline(tokenStream, token, delimiter)) tokens.push_back(token);
-  return tokens;
-}
 
 std::vector<std::string> findExecutables(const std::string& program) {
   std::vector<std::string> paths;
@@ -148,15 +32,6 @@ std::vector<std::string> findExecutables(const std::string& program) {
       paths.push_back(p.string());
   }
   return paths;
-}
-
-void recursive_search(const std::filesystem::path& dir, std::vector<std::string>& paths) {
-  if (std::filesystem::exists(dir) && std::filesystem::is_directory(dir)) {
-    for (const auto& entry : std::filesystem::recursive_directory_iterator(dir)) {
-      if (std::filesystem::is_regular_file(entry.status()))
-        paths.push_back(entry.path().string());
-    }
-  }
 }
 
 std::string getEnvVar(std::string key) {
@@ -317,7 +192,7 @@ int main(int argc, char **argv) {
             quoteType = parts[1][0];
             inQuotes = true;
           } else {
-            if (is_digits(parts[1])) {
+            if (isDigits(parts[1])) {
               vars.push_back({parts[0], stoi(parts[1])});
             } else {
               std::transform(parts[1].begin(), parts[1].end(), parts[1].begin(),
@@ -466,7 +341,7 @@ int main(int argc, char **argv) {
   }
 
   std::vector<std::string> paths;
-  recursive_search(SourceDir, paths);
+  recursiveSearch(SourceDir, paths);
 
   for (const auto& path: paths) {
     std::cout << "Compiling '" << path << "'" << std::endl;
