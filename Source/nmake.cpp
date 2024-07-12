@@ -15,6 +15,23 @@
 #include <variant>
 #include <filesystem>
 #include <cstddef>
+#include <cstring>
+#include <getopt.h>
+
+void usage(void) {
+	printf("nmake [-hv] <command>\n\n");
+	printf("AVAILABLE COMMANDS:\n");
+	printf("	new - Create a new source environment.\n");
+	printf("	add - Auto-generate a NMake config file based on an existing project.\n");
+}
+
+void version(void) {
+	printf("nmake version 20240712\n");
+	printf("nmake is distributed as a part of NISD.\n\n");
+	printf("Copyright (c) 2024 N11 Software. All rights reserved.\n");
+	printf("The software known as 'nmake' is distributed under the BSD 3-Clause License.\n");
+	printf("See COPYRIGHT in the source tree for more information.\n");
+}
 
 std::vector<std::string> findExecutables(const std::string& program) {
   std::vector<std::string> paths;
@@ -46,37 +63,57 @@ std::string to_lower(const std::string& str) {
   return newstr;
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char *argv[]) {
   bool newEnv = false, addingToProject = false, isCustom = false;
   std::vector<std::string> customCommand;
   std::string envName = "";
   unsigned char type = 0, lang;
+
+	int opt;
+	while ((opt = getopt(argc, argv, "hv")) != -1) {
+		switch (opt) {
+			case 'h':
+				usage();
+				return 0;
+			case 'v':
+				version();
+				return 0;
+			default:
+				usage();
+				return 1;
+				break;
+		}
+	}
+
+	int remainingArgc = argc - optind;
+	char **remainingArgv = argv + optind;
+
   // Read arguments
   for (int x = 1; x < argc; x++) {
     switch (x) {
       case 1:
-        if (!strcmp(argv[1], "new")) newEnv = true;
-        else if (!strcmp(argv[1], "add")) addingToProject = true;
+        if (!strcmp(remainingArgv[0], "new")) newEnv = true;
+        else if (!strcmp(remainingArgv[0], "add")) addingToProject = true;
         else {
           isCustom = true;
-          customCommand.push_back(argv[x]);
+          customCommand.push_back(remainingArgv[x]);
         }
         break;
       case 2:
         if (newEnv || addingToProject) {
-          if (std::regex_match(argv[x], std::regex("[A-Za-z0-9]+"))) {
-            envName = argv[x];
+          if (std::regex_match(remainingArgv[x], std::regex("[A-Za-z0-9]+"))) {
+            envName = remainingArgv[x];
           } else {
-            std::cerr << "Invalid environment name: " << argv[x] << std::endl;
+            std::cerr << "Invalid environment name: " << remainingArgv[x] << std::endl;
             return 1;
           }
         }
         break;
       default:
         // Handle custom command arguments
-        customCommand.push_back(argv[x]);
+        customCommand.push_back(remainingArgv[x]);
         break;
-    } 
+    }
   }
 
   // Create new environment if needed.
@@ -122,7 +159,7 @@ int main(int argc, char **argv) {
 
     mkdir("Source", 0700);
     mkdir("Build", 0700);
-    
+
     if (l == "C") {
       std::ofstream src("Source/" + envName + ".c");
       src << "#include <stdio.h>\n\n";
