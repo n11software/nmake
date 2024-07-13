@@ -1,3 +1,15 @@
+//========= Copyright N11 Software, All rights reserved. ============//
+//
+// File: nmake.cpp
+//
+// Purpose: main function for nmake.
+//
+// Maintainer: atl, FiRe
+//
+// Warning: this code is hacky asf, good luck navigating it. :-)
+//
+//===================================================================//
+
 #include "Utils/FileUtils.h"
 #include "Utils/StringUtils.h"
 #include "Utils/TerminalUtils.h"
@@ -26,7 +38,7 @@ void usage(void) {
 }
 
 void version(void) {
-	printf("nmake version 20240712\n");
+	printf("nmake version 20240713\n");
 	printf("nmake is distributed as a part of NISD.\n\n");
 	printf("Copyright (c) 2024 N11 Software. All rights reserved.\n");
 	printf("The software known as 'nmake' is distributed under the BSD 3-Clause License.\n");

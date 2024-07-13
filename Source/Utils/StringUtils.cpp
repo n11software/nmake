@@ -1,3 +1,10 @@
+//========= Copyright N11 Software, All rights reserved. ============//
+//
+// File: StringUtils.cpp
+// Purpose: various string-related functions
+//
+//===================================================================//
+
 #include "StringUtils.h"
 
 #include <algorithm>
@@ -17,6 +24,9 @@ std::string rtrim(const std::string& str) {
 	return std::string(str.begin(), end.base());
 }
 
+//-----------------------------------------------------------------------------
+// trims whitespace off of beginning and end of string
+//-----------------------------------------------------------------------------
 std::string trim(const std::string& str) {
 	return ltrim(rtrim(str));
 }
@@ -32,6 +42,9 @@ bool isDigits(const std::string& str) {
 	return true;
 }
 
+//-----------------------------------------------------------------------------
+// splits string using a specific character
+//-----------------------------------------------------------------------------
 std::vector<std::string> split(const std::string& str, char delimiter) {
 	std::vector<std::string> tokens;
 	std::string token;
